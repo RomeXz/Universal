@@ -18,7 +18,6 @@ local rayTick = 0
 local cachedTargets = {}
 local visibilityCache = {}
 
--- FIX: PlayerCache declared HERE, before any GUI button closures reference it
 local PlayerCache = {}
 
 local State = {
@@ -53,7 +52,6 @@ local Theme = {
     Muted    = Color3.fromRGB(120, 160, 200),
 }
 
--- ─────────────────────────── LOADER ────────────────────────────────────────
 local Messages = {
     "Connecting to Nokix Hub...",
     "Loading modules...",
@@ -226,7 +224,7 @@ outro:Play()
 outro.Completed:Wait()
 screenGui:Destroy()
 
--- ─────────────────────────── FOV CIRCLE ────────────────────────────────────
+
 local FOVCircle
 pcall(function()
     FOVCircle = Drawing.new("Circle")
@@ -237,7 +235,6 @@ pcall(function()
     FOVCircle.Visible = true
 end)
 
--- ─────────────────────────── HELPERS ───────────────────────────────────────
 local function isTeammate(p)
     return LocalPlayer.Team and p.Team == LocalPlayer.Team
 end
@@ -258,8 +255,6 @@ local function getDistance(pos1, pos2)
     return math.floor((pos1 - pos2).Magnitude)
 end
 
--- ─────────────────────────── MAIN GUI ──────────────────────────────────────
--- FIX: Main is now taller (310px) and uses a ScrollingFrame for content
 local Gui = Instance.new("ScreenGui", CoreGui)
 Gui.Name = "NokixHub_GUI"
 Gui.ResetOnSpawn = false
@@ -401,10 +396,9 @@ btnM.MouseButton1Click:Connect(function()
     btnE.BackgroundColor3 = Theme.Gradient
     btnM.BackgroundColor3 = Theme.Primary
 end)
--- Init aimbot tab canvas
+
 Content.CanvasSize = UDim2.new(0, 0, 0, 200)
 
--- ─────────────────────────── UI HELPERS ────────────────────────────────────
 local ROW = 26  -- compact row height
 
 local function toggle(parent, text, y, default, cb)
@@ -426,7 +420,6 @@ local function toggle(parent, text, y, default, cb)
     end)
 end
 
--- FIX: Slider now takes only ~28px total (label row + bar row)
 local function slider(parent, text, y, min, max, start, cb)
     local lbl = Instance.new("TextLabel", parent)
     lbl.Size = UDim2.new(1, -58, 0, 16)
@@ -458,7 +451,6 @@ local function slider(parent, text, y, min, max, start, cb)
         cb(math.floor(v + 0.5))
     end
 
-    -- FIX: compact -/+ buttons aligned to the right on the label row
     local btnDec = Instance.new("TextButton", parent)
     btnDec.Size = UDim2.new(0, 22, 0, 20)
     btnDec.Position = UDim2.new(1, -48, 0, y)
@@ -503,14 +495,11 @@ local function btn(parent, text, y, cb)
     b.MouseButton1Click:Connect(cb)
 end
 
--- ─────────────────────────── AIMBOT TAB ────────────────────────────────────
--- Compact layout: each toggle = ROW(26), slider = 28, button = ROW
 toggle(AimbotFrame, "Enable Aimbot",    0,  false, function(v) State.AimbotEnabled = v end)
 toggle(AimbotFrame, "Lock Teammates",   26, true,  function(v) State.LockTeammates = v end)
 toggle(AimbotFrame, "Disable Wall Lock",52, true,  function(v) State.DisableWallLock = v end)
 toggle(AimbotFrame, "Show FOV",         78, true,  function(v) State.ShowFOV = v end)
 
--- FOV slider at y=104
 local FOVLabel = Instance.new("TextLabel", AimbotFrame)
 FOVLabel.Position = UDim2.new(0, 2, 0, 104)
 FOVLabel.Size = UDim2.new(1, -58, 0, 16)
@@ -564,23 +553,11 @@ PartBtn.MouseButton1Click:Connect(function()
     PartBtn.Text = "Target: " .. State.AimbotTargetPart
 end)
 
--- ─────────────────────────── ESP TAB ───────────────────────────────────────
 toggle(ESPFrame, "Box ESP",      0,   false, function(v) State.ESP.BoxESP = v end)
 toggle(ESPFrame, "Outline ESP",  26,  false, function(v) State.ESP.OutlineESP = v end)
 toggle(ESPFrame, "Name ESP",     52,  false, function(v) State.ESP.NameESP = v end)
 toggle(ESPFrame, "Distance ESP", 78,  false, function(v) State.ESP.DistanceESP = v end)
 toggle(ESPFrame, "Team ESP",     104, false, function(v) State.ESP.ESPTeammates = v end)
-
--- ─────────────────────────── MOVEMENT TAB ──────────────────────────────────
--- FIX: Correct compact layout, total ~256px (fits in 260px frame)
--- y=0   Enable Fly       (26)
--- y=26  Fly Speed slider (28) → ends y=54
--- y=56  No Clip          (26) → ends y=82
--- y=84  Walk Speed       (28) → ends y=112
--- y=114 Jump Power       (28) → ends y=142
--- y=144 Infinite Jump    (26) → ends y=170
--- y=172 TP To Nearest    (24) → ends y=196
--- y=200 TP Back          (24) → ends y=224
 toggle(MovementFrame, "Enable Fly",     0,   false, function(v) State.FlyEnabled = v end)
 slider(MovementFrame, "Fly Speed",      26,  16, 200, 50,  function(v) State.FlySpeed = v end)
 toggle(MovementFrame, "No Clip",        56,  false, function(v) State.NoClip = v end)
@@ -621,7 +598,6 @@ btn(MovementFrame, "TP Back / Return", 200, function()
     end
 end)
 
--- ─────────────────────────── ESP SYSTEM ────────────────────────────────────
 local ESPTable = {}
 local function createESP(player)
     if player == LocalPlayer then return end
@@ -678,14 +654,12 @@ for _, p in ipairs(Players:GetPlayers()) do addPlayer(p) end
 Players.PlayerAdded:Connect(addPlayer)
 Players.PlayerRemoving:Connect(removePlayer)
 
--- ─────────────────────────── INFINITE JUMP ─────────────────────────────────
 UserInputService.JumpRequest:Connect(function()
     if State.InfiniteJump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
         LocalPlayer.Character.Humanoid:ChangeState("Jumping")
     end
 end)
 
--- ─────────────────────────── FLY / NOCLIP ──────────────────────────────────
 RunService.RenderStepped:Connect(function()
     if State.FlyEnabled then
         local char = LocalPlayer.Character
@@ -718,7 +692,6 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- ─────────────────────────── MAIN LOOP ─────────────────────────────────────
 RunService.RenderStepped:Connect(function(dt)
     rayTick  = rayTick  + dt
     espTick  = espTick  + dt
