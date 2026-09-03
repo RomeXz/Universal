@@ -41,7 +41,6 @@ local Theme = {
 	Green = Color3.fromRGB(60, 255, 120)
 }
 
--- ─────────────────────────── LOADER ────────────────────────────────────────
 local Messages = {
 	"Connecting to Nokix Hub...",
 	"Loading modules...",
@@ -213,7 +212,6 @@ end
 outro:Play()
 outro.Completed:Wait()
 screenGui:Destroy()
--- ──────────────────────── END OF LOADER ────────────────────────────────────
 
 local State = {
 	AimbotEnabled = false,
