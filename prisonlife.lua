@@ -54,8 +54,8 @@ end)
 
 local Window = Rayfield:CreateWindow({
     Name = "NOKIX HUB (Prison Life)",
-    LoadingTitle = "Rayfield Interface Suite",
-    LoadingSubtitle = "by Sirius | Prison Life",
+    LoadingTitle = "Nokix Hub",
+    LoadingSubtitle = "by NowmsDev",
     Theme = "Default",
     ConfigurationSaving = {
         Enabled = true,
