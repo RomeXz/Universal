@@ -227,7 +227,7 @@ local function AddHover(btn, normal, hover)
 end
 
 local Text = {
-	title = "Nokix Hub",
+	title = "Nokix Hub (Steal an egg)",
 	maxLabel = "Hop if players in this server are MORE than:",
 	hopBtn = "Hop Once",
 	autoOff = "Auto Hop: OFF",
